@@ -9,16 +9,16 @@ import numpy as np
 from pyzbar.pyzbar import decode
  
 #cam = cv2.VideoCapture(0)
-arduino = SerialObject()
+#arduino = serial.Serial(port = '/dev/ttyACM0')
 
 fig = plt.figure(figsize=(8,8))
 ax = fig.add_subplot(111, projection='polar')
 ax.set_title('lidar (exit: Key E)',fontsize=18)
 
-# Eキーを押すと終了します。
+
 plt.connect('key_press_event', lambda event: exit(1) if event.key == 'e' else None)
 
-ser = serial.Serial(port='/dev/ttyUSB1',
+ser = serial.Serial(port='/dev/ttyUSB0',
                     baudrate=230400,
                     timeout=5.0,
                     bytesize=8,
@@ -58,7 +58,6 @@ while True:
         
 
     while loopFlag:
-        print("hi")
         b = ser.read()
         tmpInt = int.from_bytes(b, 'big')
         
@@ -79,11 +78,12 @@ while True:
             lidarData = CalcLidarData(tmpString[0:-5])
             angles.extend(lidarData.Angle_i)
             distances.extend(lidarData.Distance_i)
-            if (lidarData.Angle_i[1] < 1 or lidarData.Angle_i[1] > 5) and lidarData.Distance_i[1] <= 20:
-                arduino.sendData([1])
+            if (lidarData.Angle_i[1] < 1 or lidarData.Angle_i[1] > 5) and lidarData.Distance_i[1] <= 5:
+                #arduino.write(1)
                 print("Warning")
             else:
-                arduino.sendData([0])
+                print("hi")
+                #arduino.write(0)
             tmpString = ""
             loopFlag = False
         else:
