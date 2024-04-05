@@ -134,12 +134,11 @@ void loop() {
   // Process the incoming buffer 
   update_buffer();
 	serialData.Get(valsRec);
-	if(valsRec[0] == 1){
-		digitalWrite(backward, LOW);
-    		delay(500);
-    		digitalWrite(forward, LOW);
-    		Serial.println("<forward>");
-	}
+  Serial.println(valsRec[0]);
+
+
+ 
+ 
   // If we have received a valid command string structure, that is
   // we have received a start character, zero of more other characters and then
   // an end character.

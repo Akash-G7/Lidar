@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import math
 import cv2
 import numpy as np
+import time
 from pyzbar.pyzbar import decode
  
 #cam = cv2.VideoCapture(0)
@@ -18,7 +19,7 @@ ax.set_title('lidar (exit: Key E)',fontsize=18)
 # Eキーを押すと終了します。
 plt.connect('key_press_event', lambda event: exit(1) if event.key == 'e' else None)
 
-ser = serial.Serial(port='/dev/ttyUSB1',
+ser = serial.Serial(port='COM7',
                     baudrate=230400,
                     timeout=5.0,
                     bytesize=8,
@@ -82,6 +83,8 @@ while True:
             if (lidarData.Angle_i[1] < 1 or lidarData.Angle_i[1] > 5) and lidarData.Distance_i[1] <= 20:
                 arduino.sendData([1])
                 print("Warning")
+                print(lidarData.Distance_i[1])
+
             else:
                 arduino.sendData([0])
             tmpString = ""
