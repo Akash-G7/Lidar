@@ -8,15 +8,16 @@ import cv2
 import numpy as np
 import time
 from pyzbar.pyzbar import decode
+from time import sleep
  
 #cam = cv2.VideoCapture(0)
-arduino = SerialObject()
+arduino = serial.Serial(port = 'COM5')
+sleep(.1)
+# fig = plt.figure(figsize=(8,8))
+# ax = fig.add_subplot(111, projection='polar')
+# ax.set_title('lidar (exit: Key E)',fontsize=18)
 
-fig = plt.figure(figsize=(8,8))
-ax = fig.add_subplot(111, projection='polar')
-ax.set_title('lidar (exit: Key E)',fontsize=18)
 
-# Eキーを押すと終了します。
 plt.connect('key_press_event', lambda event: exit(1) if event.key == 'e' else None)
 
 ser = serial.Serial(port='COM7',
@@ -31,6 +32,7 @@ lines = list()
 angles = list()
 distances = list()
 i = 0
+isOn = 0
 while True:
     loopFlag = True
     flag2c = False
@@ -46,20 +48,20 @@ while True:
    #     cv2.putText(img, myData, (pts2[0],pts2[1]),cv2.FONT_HERSHEY_SIMPLEX,0.9, (0,255,0),2)
    # cv2.imshow('Result', img)
    # cv2.waitKey(1)
-    if(i % 40 == 39):
-        if('line' in locals()):
-            line.remove()
-        line = ax.scatter(angles, distances, c="pink", s=5)
+    # if(i % 40 == 39):
+    #     if('line' in locals()):
+    #         line.remove()
+    #     line = ax.scatter(angles, distances, c="pink", s=5)
 
-        ax.set_theta_offset(math.pi / 2)
-        plt.pause(0.01)
-        angles.clear()
-        distances.clear()
-        i = 0
-        
+    #     ax.set_theta_offset(math.pi / 2)
+    #     plt.pause(0.01)
+    #     angles.clear()
+    #     distances.clear()
+    #     i = 0
+    
+
 
     while loopFlag:
-        print("hi")
         b = ser.read()
         tmpInt = int.from_bytes(b, 'big')
         
@@ -80,13 +82,28 @@ while True:
             lidarData = CalcLidarData(tmpString[0:-5])
             angles.extend(lidarData.Angle_i)
             distances.extend(lidarData.Distance_i)
-            if (lidarData.Angle_i[1] < 1 or lidarData.Angle_i[1] > 5) and lidarData.Distance_i[1] <= 20:
-                arduino.sendData([1])
+            if ((lidarData.Angle_i[1] < 1 or lidarData.Angle_i[1] > 5) and lidarData.Distance_i[1] <= 3):
+                sleep(1)
+                if (isOn == 1):
+                    arduino.write('<w->'.encode(encoding='ascii', errors='strict'))
+                    arduino.flush()
+                    isOn = 0;
+
                 print("Warning")
                 print(lidarData.Distance_i[1])
+                print(lidarData.Angle_i[1])
 
-            else:
-                arduino.sendData([0])
+                    
+
+
+            elif ((lidarData.Angle_i[1] < 1 or lidarData.Angle_i[1] > 5) and lidarData.Distance_i[1] > 3):
+                print("hi")
+                print(isOn)
+                sleep(1)
+                if (isOn == 0):
+                    arduino.write('<w>'.encode(encoding='ascii', errors='strict'))
+                    arduino.flush()
+                    isOn = 1
             tmpString = ""
             loopFlag = False
         else:

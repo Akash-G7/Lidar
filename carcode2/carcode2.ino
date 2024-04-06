@@ -1,7 +1,7 @@
 #define BUFFER_SIZE 512
-#include <cvzone.h>
+// #include <cvzone.h>
 
-SerialData serialData(1,1);
+// SerialData serialData(1,1);
 int valsRec[1];
 int left = 3;
 int right = 4;
@@ -21,7 +21,7 @@ bool start_character_detected = false;
 bool end_character_detected = false;
 
 void setup() {
-  serialData.begin();
+//  serialData.begin();
   Serial.begin(9600);
   pinMode(left, OUTPUT); 
   pinMode(right, OUTPUT); 
@@ -133,11 +133,10 @@ void straighten(bool x){
 void loop() {
   // Process the incoming buffer 
   update_buffer();
-	serialData.Get(valsRec);
-  Serial.println(valsRec[0]);
+	// serialData.Get(valsRec);
+  // Serial.println(valsRec[0]);
 
-
- 
+  
  
   // If we have received a valid command string structure, that is
   // we have received a start character, zero of more other characters and then
